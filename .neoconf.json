@@ -1,0 +1,17 @@
+{
+    "neodev": {
+        "library": {
+            "plugins": [
+                "nvim-lspconfig",
+                "neoconf.nvim"
+            ]
+        }
+    },
+    "lspconfig": {},
+    "luals": {
+        "addons": [
+            "busted",
+            "luassert"
+        ]
+    }
+}
