@@ -25,8 +25,16 @@ function M.register()
                 description = "",
                 type = "array",
                 items = {
-                    type = "string",
-                    enum = addon_names,
+                    anyOf = {
+                        {
+
+                            type = "string",
+                            enum = addon_names,
+                        },
+                        {
+                            type = "string",
+                        },
+                    },
                 },
             })
         end,

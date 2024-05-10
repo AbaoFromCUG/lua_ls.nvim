@@ -2,6 +2,10 @@
 ---@field repository_path string
 local Git = {}
 
+-- function Git.isvaild_url(url)
+--     if url.match
+-- end
+
 ---Git construction
 ---@return luals.Git
 function Git:new()
@@ -11,7 +15,7 @@ function Git:new()
     setmetatable(o, {
         __index = self,
     })
-    
+
     return o
 end
 

@@ -44,4 +44,10 @@ function fs.joinpath(...)
     return table.concat({ ... }, "/")
 end
 
+-- ---@param path string
+-- ---@return string
+-- function fs.dirname(path)
+--     return vim.fs.dirname(path) --[[@as string]]
+-- end
+
 return fs

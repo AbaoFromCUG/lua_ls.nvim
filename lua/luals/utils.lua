@@ -40,7 +40,7 @@ end
 
 function M.flatten(settings)
     local function _flatten(tbl)
-        if type(tbl) == "string" or type(tbl) == "number" or type(tbl)=="boolean" then
+        if type(tbl) == "string" or type(tbl) == "number" or type(tbl) == "boolean" then
             return tbl
         elseif M.islist(tbl) then
             local ctbl = {}
