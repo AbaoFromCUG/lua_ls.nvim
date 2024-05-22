@@ -1,5 +1,5 @@
-local luals = require("luals")
-local manager = require("luals.addon_manager")
+local lua_ls = require("lua_ls")
+local manager = require("lua_ls.addon_manager")
 
 local cmds = {
     install = {
@@ -19,12 +19,12 @@ local cmds = {
             end, manager.addons)
         end,
         execute = function(name)
-            manager.enable(name)
+            manager.enable({ name })
         end,
     },
     status = {
         execute = function()
-            vim.cmd("checkhealth luals")
+            vim.cmd("checkhealth lua_ls")
         end,
     },
 }
@@ -32,7 +32,7 @@ local cmds = {
 vim.api.nvim_create_user_command("Luals", function(opts)
     local cmd = cmds[opts.fargs[1]]
     if cmd == nil then
-        luals.open()
+        lua_ls.open()
     else
         table.remove(opts.fargs, 1)
         cmd.execute(unpack(opts.fargs))

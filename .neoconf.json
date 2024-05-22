@@ -1,17 +1,22 @@
 {
-    "neodev": {
-        "library": {
-            "plugins": [
-                "nvim-lspconfig",
-                "neoconf.nvim"
-            ]
-        }
-    },
-    "lspconfig": {},
-    "luals": {
-        "addons": [
-            "busted",
-            "luassert"
-        ]
+  "neodev": {
+    "library": {
+      "enabled": true,
+      "plugins": [
+        "nvim-lspconfig",
+        "neoconf.nvim"
+      ]
     }
+  },
+  "lspconfig": {
+    "lua_ls": {
+      "addonManager": {
+        "addons": [
+          "luassert",
+          "busted",
+          "git@github.com:AbaoFromCUG/wezterm-luals-addon.git"
+        ]
+      },
+    }
+  }
 }

@@ -1,0 +1,95 @@
+local fs = require("lua_ls.fs")
+
+
+-- local Addon = {}
+
+-- ----@private
+-- function Addon:load_config()
+--     local config_path = vim.fs.joinpath(self.path, "config.json")
+--     if fs.is_exists(config_path) then
+--         local config = vim.json.decode(fs.read_file(config_path))
+--         assert(config, "can't read" .. vim.inspect(config_path))
+--         if config.settings ~= nil then
+--             self.config_settings = config.settings
+--         end
+--         self.library_settings = { ["Lua.workspace.library"] = { self.path } }
+--         self.installed = true
+--     else
+--         self.installed = false
+--     end
+-- end
+--
+-- ---@class lua_ls.BuiltinAddon: lua_ls.Addon
+-- local BuiltinAddon = {}
+-- setmetatable(BuiltinAddon, { __index = Addon })
+--
+-- function BuiltinAddon.new(info_path)
+--     local path = vim.fs.dirname(info_path)
+--     ---@type lua_ls.BuiltinAddon
+--     local addon = {
+--         path = vim.fs.joinpath(path, "module"),
+--         enabled = false,
+--     }
+--     setmetatable(addon, {
+--         __index = BuiltinAddon,
+--     })
+--     addon:load_info()
+--     addon:load_config()
+--     return addon
+-- end
+--
+-- function BuiltinAddon:load_info()
+--     local info_path = vim.fs.dirname(self.path)
+--     local info = vim.json.decode(fs.read_file(info_path))
+--     assert(info, "can't read" .. vim.inspect(info_path))
+--     self.name = vim.fs.basename(vim.fs.dirname(info_path))
+--     self.display_name = info.name or self.name
+--     self.size = info.size
+--     self.description = info.description
+--     self.has_plugin = info.hasPlugin
+-- end
+--
+-- --
+-- --
+-- -- ---construct a addon from info.json
+-- -- ---@param config_path string
+-- -- function Addon.from_config(config_path)
+-- --     local path = vim.fs.dirname(config_path)
+-- --     local addon = {
+-- --         path = path,
+-- --         enabled = false,
+-- --     }
+-- --     setmetatable(addon, {
+-- --         __index = Addon,
+-- --     })
+-- --     addon.name = vim.fs.basename(path)
+-- --     addon.display_name = addon.name
+-- --
+-- --     ---@cast addon lua_ls.Addon
+-- --     addon:load_config()
+-- --     return addon
+-- -- end
+-- --
+--
+-- -- ---install addon
+-- -- ---@param callback? fun()
+-- -- function Addon:install(callback)
+-- --     local git = require("lua_ls.addon_manager").git
+-- --     -- callback hell
+-- --     git:submodule_init(self.path)
+-- --     git:submodule_update(self.path)
+-- --     self.installed = true
+-- --     if callback then
+-- --         callback()
+-- --     end
+-- -- end
+--
+-- -- function Addon:enable()
+-- --     self.enabled = true
+-- -- end
+-- --
+-- -- function Addon:disable()
+-- --     self.enabled = false
+-- -- end
+--
+-- return Addon

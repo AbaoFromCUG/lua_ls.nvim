@@ -1,0 +1,71 @@
+---@class lua_ls.Addon
+---@field id string Identify plugin, includes: dirname(for builtin addon), url(for remote addon), path(for local addon)
+---@field display_name string The display name which is defined in info.json, may be empty for some addon
+---@field description string A description for this addon
+---@field size number The size of the addon. Generated automatically
+---@field has_plugin boolean Whether this addon contains a plugin. Generated automatically
+---@field path string The path of this addon
+---@field config_settings? {[string]: any}
+---@field library_settings {[string]: any}
+---@field installed boolean Whether this addon is installed
+
+---@alias lua_ls.NeovimAddonName
+---| 'nvim'
+---| 'nvim-nightly'
+
+--generated from $git submodule status |awk '{print $2}'|awk -F "/" '{print $2}'|sort
+---@alias lua_ls.BuiltinAddonName
+---| 'REFramework-LLS'
+---| 'RavenscriptIDEA'
+---| 'RavenscriptIDEA_withRavenM'
+---| 'StormworksAddonLua'
+---| 'TTSLua'
+---| 'ao'
+---| 'argparse'
+---| 'bee'
+---| 'busted'
+---| 'cc-tweaked'
+---| 'cocos4.0'
+---| 'dkjson'
+---| 'fivem'
+---| 'garrysmod'
+---| 'halion'
+---| 'lapis'
+---| 'lldebugger'
+---| 'lmathx'
+---| 'love-nuklear'
+---| 'love2d'
+---| 'lovr'
+---| 'lpeg'
+---| 'lua-cjson'
+---| 'luaecs'
+---| 'luafilesystem'
+---| 'luaharfbuzz'
+---| 'lualogging'
+---| 'luasocket'
+---| 'luassert'
+---| 'luaunit'
+---| 'luazip'
+---| 'luvit'
+---| 'lzlib'
+---| 'md5'
+---| 'minetest'
+---| 'mirai'
+---| 'moneymoney'
+---| 'moonloader'
+---| 'nodemcu-esp32'
+---| 'nodemcu-esp8266'
+---| 'openresty'
+---| 'penlight'
+---| 'powder-toy'
+---| 'skynet'
+---| 'slnunicode'
+---| 'tex-lualatex'
+---| 'tex-lualibs'
+---| 'tex-luametatex'
+---| 'tex-luatex'
+---| 'transformice'
+---| 'umbrella'
+---| 'unbound-api'
+---| 'xmake'
+---| 'yue'

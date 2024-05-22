@@ -11,5 +11,10 @@
 # 		-c "PlenaryBustedDirectory ${TESTS_DIR} { minimal_init = '${MINI_INIT}' }"
 #
 
+gen_types:
+	@nvim \
+		--headless \
+		-c "set rtp+=." -l ./scripts/gen_annotation.lua
+
 format:
 	stylua --check .
