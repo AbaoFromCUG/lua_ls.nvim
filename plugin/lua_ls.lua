@@ -1,25 +1,24 @@
 local lua_ls = require("lua_ls")
-local manager = require("lua_ls.addon_manager")
 
 local cmds = {
     install = {
         complete = function()
             return vim.tbl_map(function(addon)
                 return addon.name
-            end, manager.addons)
+            end, lua_ls.addon_manager.addons)
         end,
         execute = function(name)
-            manager.install(name)
+            lua_ls.addon_manager:get_addon(name)
         end,
     },
     enable = {
         complete = function()
             return vim.tbl_map(function(addon)
                 return addon.name
-            end, manager.addons)
+            end, lua_ls.addon_manager.addons)
         end,
         execute = function(name)
-            manager.enable({ name })
+            -- lua_ls.addon_manager.enable({ name })
         end,
     },
     status = {
@@ -61,3 +60,4 @@ end, {
         end
     end,
 })
+

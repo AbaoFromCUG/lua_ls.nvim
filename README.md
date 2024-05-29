@@ -22,25 +22,23 @@
 * Dependent on `nvim-lspconfig.nvim`
 * It is a substitute for `require("lspconfig").lua_ls.setup({})`
 
-lazy.nvim
 
 ```lua
-{
-    "AbaoFromCUG/lua_ls.nvim",
-    ---@type lua_ls.Config
-    config = {
-        settings={
-            addonManager={
-                addons={
+require("lua_ls").setup({
+    settings = {
+        Lua = {
+            ---@type lua_ls.AddonManagerSetting
+            addonManager = {
+                enable = true,
+                addons = {
                     "luassert",
-                    "busted"
-                }
-            }
-        }
+                    "busted",
+                },
+            },
+            --- any other settings for lua_ls
+        },
     },
-    ft = { "lua" },
-    dev = true,
-},
+})
 ```
 
 

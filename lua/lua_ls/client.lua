@@ -5,15 +5,16 @@ local client = {}
 function client.setup(config)
     local addon_manager = require("lua_ls").addon_manager
     config = vim.deepcopy(config)
-    local all_settings = vim.iter(addon_manager.addons)
-        :map(function(_, addon)
+    local all_settings = vim.iter(vim.tbl_values(addon_manager.addons))
+        :map(function(addon)
+            -- print(vim.inspect(addon))
             ---@cast addon lua_ls.Addon
             return { addon.library_settings, addon.config_settings }
         end)
         :flatten()
         :totable()
     config.settings = utils.merge(config.settings, unpack(all_settings))
-    print("setup", vim.inspect(config.settings.Lua.workspace))
+    -- print("setup", vim.inspect(config.settings.Lua.workspace))
     require("lspconfig").lua_ls.setup(config)
 end
 
@@ -25,8 +26,8 @@ function client.update_settings()
     end
 
     local addon_manager = require("lua_ls").addon_manager
-    local all_settings = vim.iter(addon_manager.addons)
-        :map(function(_, addon)
+    local all_settings = vim.iter(vim.tbl_values(addon_manager.addons))
+        :map(function(addon)
             ---@cast addon lua_ls.Addon
             return { addon.library_settings, addon.config_settings }
         end)

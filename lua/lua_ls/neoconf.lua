@@ -1,3 +1,4 @@
+local utils = require("lua_ls.utils")
 local a = require("lua_ls.async")
 
 local M = {}
@@ -7,10 +8,13 @@ function M.setup()
     local function load_settings()
         local manager = require("lua_ls").addon_manager
         local new_settings = neoconf.get("lspconfig.lua_ls")
-        a.run(function()
-            print("will update, ", vim.inspect(new_settings))
-            manager:set_setting(new_settings)
-        end)
+        new_settings = utils.flatten(new_settings or {})
+        local addonSetting = vim.tbl_get(new_settings, "Lua", "addonManager")
+        if addonSetting then
+            a.run(function()
+                manager:set_setting(addonSetting)
+            end)
+        end
     end
     require("neoconf.plugins").register({
         name = "lua_ls",
@@ -26,7 +30,6 @@ function M.setup()
             load_settings()
         end,
     })
-
     load_settings()
 end
 

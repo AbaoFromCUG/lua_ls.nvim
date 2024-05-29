@@ -46,17 +46,17 @@ local M = {}
 ---@param config lua_ls.Config
 function M.setup(config)
     M.config = vim.tbl_deep_extend("force", default_config, config or {})
-    if M.config.settings.Lua.addonManager.enable then
-        M.addon_manager = AddonManager.new(M.config.settings.Lua.addonManager)
-    end
-    if pcall(require, "neoconf") then
-        require("lua_ls.neoconf").setup()
-    end
-
-    client.setup(M.config)
-    -- async setup
     a.run(function()
-        M.addon_manager:setup()
+        if M.config.settings.Lua.addonManager.enable then
+            M.addon_manager = AddonManager.new(M.config.settings.Lua.addonManager)
+            if pcall(require, "neoconf") then
+                require("lua_ls.neoconf").setup()
+            end
+            M.addon_manager:setup()
+        end
+        vim.schedule(function()
+            client.setup(M.config)
+        end)
     end)
 end
 
