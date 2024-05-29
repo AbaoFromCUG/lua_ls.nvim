@@ -3,12 +3,12 @@ local a = require("lua_ls.async")
 local M = {}
 
 function M.setup()
-    local manager_settings = require("lua_ls").config.settings.addonManager
     local neoconf = require("neoconf")
     local function load_settings()
         local manager = require("lua_ls").addon_manager
-        local new_settings = neoconf.get("lspconfig.lua_ls.addonManager", manager_settings)
+        local new_settings = neoconf.get("lspconfig.lua_ls")
         a.run(function()
+            print("will update, ", vim.inspect(new_settings))
             manager:set_setting(new_settings)
         end)
     end
@@ -21,21 +21,6 @@ function M.setup()
                     return v.name
                 end)
                 :totable()
-
-            schema:set("lspconfig.lua_ls.addonManager.addons", {
-                type = "array",
-                items = {
-                    anyOf = {
-                        {
-                            type = "string",
-                            enum = addon_names,
-                        },
-                        {
-                            type = "string",
-                        },
-                    },
-                },
-            })
         end,
         on_update = function()
             load_settings()

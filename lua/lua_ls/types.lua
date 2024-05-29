@@ -1,20 +1,20 @@
 ---@class lua_ls.Addon
 ---@field id string Identify plugin, includes: dirname(for builtin addon), url(for remote addon), path(for local addon)
----@field display_name string The display name which is defined in info.json, may be empty for some addon
----@field description string A description for this addon
----@field size number The size of the addon. Generated automatically
----@field has_plugin boolean Whether this addon contains a plugin. Generated automatically
----@field path string The path of this addon
+---@field display_name? string The display name which is defined in info.json, may be empty for some addon
+---@field description? string A description for this addon
+---@field size? number The size of the addon. Generated automatically
+---@field has_plugin? boolean Whether this addon contains a plugin. Generated automatically
+---@field path? string The path of this addon
 ---@field config_settings? {[string]: any}
 ---@field library_settings {[string]: any}
----@field installed boolean Whether this addon is installed
+---@field installed? boolean Whether this addon is installed
 
 ---@alias lua_ls.NeovimAddonName
 ---| 'nvim'
 ---| 'nvim-nightly'
 
 --generated from $git submodule status |awk '{print $2}'|awk -F "/" '{print $2}'|sort
----@alias lua_ls.BuiltinAddonName
+---@alias lua_ls.OfficialAddonName
 ---| 'REFramework-LLS'
 ---| 'RavenscriptIDEA'
 ---| 'RavenscriptIDEA_withRavenM'

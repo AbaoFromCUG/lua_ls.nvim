@@ -6,7 +6,7 @@ local AddonManager = require("lua_ls.addon_manager")
 local a = require("lua_ls.async")
 
 ---@class (exact) lua_ls.Settings
----@field addonManager? lua_ls.AddonManagerSetting
+---@field Lua? {addonManager?: lua_ls.AddonManagerSetting}
 
 local data_path = vim.fn.stdpath("data")
 ---@cast data_path string
@@ -17,12 +17,22 @@ local data_path = vim.fn.stdpath("data")
 ---@type lua_ls.Config
 local default_config = {
     settings = {
-        addonManager = {
-            enable = true,
-            installDir = vim.fs.joinpath(data_path, "lua_ls"),
-            addons = {},
-            ui = {
-                size = { width = 0.8, height = 0.8 },
+        Lua = {
+            runtime = {
+                path = { "?.lua", "?/init.lua" },
+                pathStrict = true,
+                version = "LuaJIT",
+            },
+            telemetry = {
+                enable = false,
+            },
+            addonManager = {
+                enable = true,
+                installDir = vim.fs.joinpath(data_path, "lua_ls"),
+                addons = {},
+                ui = {
+                    size = { width = 0.8, height = 0.8 },
+                },
             },
         },
     },
@@ -36,22 +46,18 @@ local M = {}
 ---@param config lua_ls.Config
 function M.setup(config)
     M.config = vim.tbl_deep_extend("force", default_config, config or {})
-    if M.config.settings.addonManager.enable then
-        M.addon_manager = AddonManager.new(M.config.settings.addonManager)
+    if M.config.settings.Lua.addonManager.enable then
+        M.addon_manager = AddonManager.new(M.config.settings.Lua.addonManager)
     end
     if pcall(require, "neoconf") then
         require("lua_ls.neoconf").setup()
     end
 
+    client.setup(M.config)
     -- async setup
-    a.run(
-        function()
-            M.addon_manager:setup()
-        end,
-        vim.schedule_wrap(function()
-            client.setup(config)
-        end)
-    )
+    a.run(function()
+        M.addon_manager:setup()
+    end)
 end
 
 function M.open()

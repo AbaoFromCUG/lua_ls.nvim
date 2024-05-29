@@ -90,7 +90,8 @@ describe("flatten", function()
         assert.are.same({ foo = { bar = { name = "myname" } } }, utils.flatten({ foo = { ["bar.name"] = "myname" } }))
     end)
     it("builtin", function()
-        local result = vim.iter({ 1, 2, 3 })
+        local result = vim
+            .iter({ 1, 2, 3 })
             :map(function(i)
                 if i == 1 then
                     return "key1", 12

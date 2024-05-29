@@ -13,27 +13,53 @@ function client.setup(config)
         :flatten()
         :totable()
     config.settings = utils.merge(config.settings, unpack(all_settings))
+    print("setup", vim.inspect(config.settings.Lua.workspace))
     require("lspconfig").lua_ls.setup(config)
 end
 
 ---enable addon
----@param addon lua_ls.Addon
-function client.enable_addon(addon)
-    local get_clients = vim.lsp.get_clients
-    local lua_ls = get_clients({ name = "lua_ls" })[1]
-    if not lua_ls then
+function client.update_settings()
+    local lsp_client = vim.lsp.get_clients({ name = "lua_ls" })[1]
+    if not lsp_client then
         return
     end
-    local new_settings = utils.merge(client.settings, addon.library_settings, addon.config_settings)
-    if vim.deep_equal(new_settings, client.settings) then
-        return
-    end
-    print(client.settings)
 
-    print(vim.inspect(client.settings))
-    local method = "workspace/didChangeConfiguration"
-    local ok, err = pcall(lua_ls.notify, method, { settings = lua_ls.settings })
+    local addon_manager = require("lua_ls").addon_manager
+    local all_settings = vim.iter(addon_manager.addons)
+        :map(function(_, addon)
+            ---@cast addon lua_ls.Addon
+            return { addon.library_settings, addon.config_settings }
+        end)
+        :flatten()
+        :totable()
+    local settings = utils.merge(lsp_client.config.settings, unpack(all_settings))
+
+    if vim.deep_equal(settings, lsp_client.config.settings) then
+        return
+    end
+    if lsp_client.config.original_settings then
+        lsp_client.config.original_settings = utils.merge(lsp_client.config.original_settings, unpack(all_settings))
+    end
+    lsp_client.config.settings = settings
+    print("update_settings", vim.inspect(settings.Lua.workspace))
+
+    local ok, err = pcall(lsp_client.notify, "workspace/didChangeConfiguration", {
+        settings = lsp_client.config.settings,
+    })
     assert(ok, err)
+end
+
+_G.restart = function()
+    local lsp_client = vim.lsp.get_clients({ name = "lua_ls" })[1]
+    if not lsp_client then
+        print("failed")
+        return
+    end
+    local ok, err = pcall(lsp_client.notify, "workspace/didChangeConfiguration", {
+        settings = lsp_client.config.settings,
+    })
+    assert(ok, err)
+    print("ok")
 end
 
 return client

@@ -1,7 +1,5 @@
 local M = {}
 
-M.islist = vim.islist or vim.tbl_islist
-
 ---merge multiple table and flatten
 ---@param ... table
 function M.merge(...)
@@ -19,8 +17,12 @@ function M.merge(...)
         local settings = vim.deepcopy(tbls[1] or {})
         for i = 2, #tbls, 1 do
             local another = tbls[i]
-            if M.islist(another) and M.islist(settings) then
-                vim.list_extend(settings, another)
+            if vim.islist(another) and vim.islist(settings) then
+                vim.iter(another):each(function(v)
+                    if not vim.iter(settings):find(v) then
+                        table.insert(settings, v)
+                    end
+                end)
             else
                 for key, value in pairs(another) do
                     local value_type = type(value)
@@ -42,7 +44,7 @@ function M.flatten(settings)
     local function _flatten(tbl)
         if type(tbl) == "string" or type(tbl) == "number" or type(tbl) == "boolean" then
             return tbl
-        elseif M.islist(tbl) then
+        elseif vim.islist(tbl) then
             local ctbl = {}
             for _, value in ipairs(tbl) do
                 table.insert(ctbl, _flatten(value))

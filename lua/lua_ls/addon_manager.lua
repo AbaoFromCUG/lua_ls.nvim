@@ -7,7 +7,7 @@ local Git = require("lua_ls.git")
 ---@class (exact) lua_ls.AddonManagerSetting
 ---@field enable? boolean
 ---@field installDir? string
----@field addons? (string|lua_ls.BuiltinAddonName)[]
+---@field addons? (string|lua_ls.OfficialAddonName|lua_ls.NeovimAddonName)[]
 ---@field ui?  lua_ls.UIConfig
 
 ---@class lua_ls.AddonManager
@@ -16,6 +16,17 @@ local Git = require("lua_ls.git")
 ---@field setting lua_ls.AddonManagerSetting
 local AddonManager = {
     official_repository_url = "https://github.com/LuaLS/LLS-Addons/",
+}
+
+local builtin_addons = {
+    nvim = {
+        id = "nvim",
+        display_name = "Neovim(stable)",
+        description = "neovim type annotations",
+        library_settings = {
+            ["Lua.workspace.library"] = { vim.fs.joinpath(vim.env.VIMRUNTIME, "lua") },
+        },
+    },
 }
 
 ---Addon manager construction
@@ -42,43 +53,46 @@ function AddonManager:repository_path(name)
 end
 
 function AddonManager:setup()
-    local builtin_repo_path = self:repository_path("LLS-Addons")
-    self.git:cwd(builtin_repo_path)
-    if not fs.is_exists(builtin_repo_path) then
-        fs.mkdir(builtin_repo_path)
-        self.git:clone(self.official_repository_url, builtin_repo_path)
+    local official_repo_path = self:repository_path("LLS-Addons")
+    self.git:cwd(official_repo_path)
+    if not fs.is_exists(official_repo_path) then
+        fs.mkdir(official_repo_path)
+        self.git:clone(self.official_repository_url, official_repo_path)
     else
         self.git:pull()
     end
     self:reload_addons()
+    local client = require("lua_ls.client")
+    client.update_settings()
 end
 
 ---update
 ---@param new_setting any
 function AddonManager:set_setting(new_setting)
-    local setting = vim.tbl_deep_extend("force", self.setting, new_setting)
+    local setting = vim.tbl_deep_extend("force", self.setting, new_setting or {})
     if not vim.deep_equal(setting, self.setting) then
         self.setting = setting
         self:reload_addons()
+        local client = require("lua_ls.client")
+        client.update_settings()
     end
 end
 
 function AddonManager:reload_addons()
-    self.addons = {}
-    local builtin_repo_path = self:repository_path("LLS-Addons")
-    self.git:cwd(builtin_repo_path)
+    local official_repo_path = self:repository_path("LLS-Addons")
+    self.git:cwd(official_repo_path)
     self.addons = vim.iter(self.setting.addons)
         :map(function(name_or_url_or_path)
             local joinpath = vim.fs.joinpath
-            if fs.is_exists(joinpath(builtin_repo_path, "addons", name_or_url_or_path)) then
-                local prefix_path = joinpath(builtin_repo_path, "addons", name_or_url_or_path)
+            if fs.is_exists(joinpath(official_repo_path, "addons", name_or_url_or_path)) then
+                local prefix_path = joinpath(official_repo_path, "addons", name_or_url_or_path)
                 local info_path = joinpath(prefix_path, "info.json")
                 local addon_path = vim.fs.joinpath(prefix_path, "module")
                 if not fs.is_exists(vim.fs.joinpath(addon_path, "config.json")) then
                     self.git:submodule_init(addon_path)
                 end
                 self.git:submodule_update(addon_path)
-                local addon = self:load_builtin_addon(info_path)
+                local addon = self:load_official_addon(info_path)
                 ---@diagnostic disable-next-line: redundant-return-value
                 return addon.id, addon
             elseif string.match(name_or_url_or_path, "^git@") or string.match(name_or_url_or_path, "^https?://") then
@@ -105,6 +119,8 @@ function AddonManager:reload_addons()
                 addon.id = addon_dir
                 ---@diagnostic disable-next-line: redundant-return-value
                 return addon_dir, addon
+            elseif builtin_addons[name_or_url_or_path] then
+                return name_or_url_or_path, builtin_addons[name_or_url_or_path]
             end
         end)
         :totable()
@@ -113,7 +129,7 @@ end
 ---load addon from info.json
 ---@param info_path string
 ---@return lua_ls.Addon
-function AddonManager:load_builtin_addon(info_path)
+function AddonManager:load_official_addon(info_path)
     local dir = vim.fs.dirname(info_path)
     local addon_path = vim.fs.joinpath(dir, "module")
     local config_path = vim.fs.joinpath(addon_path, "config.json")
@@ -127,6 +143,7 @@ function AddonManager:load_builtin_addon(info_path)
         size = info.size,
         description = info.description,
         has_plugin = info.hasPlugin,
+        -- library_settings = { ["Lua.workspace.library"] = { vim.fs.joinpath(addon_path, "library") } },
         library_settings = { ["Lua.workspace.library"] = { addon_path } },
     }
     if fs.is_exists(config_path) then
@@ -143,11 +160,12 @@ end
 ---@param config_path string
 ---@return lua_ls.Addon
 function AddonManager:load_local_addon(config_path)
-    local addon_dir = vim.fs.dirname(config_path)
+    local addon_path = vim.fs.dirname(config_path)
     local config = fs.read_addon_config(config_path)
     local addon = {
-        name = vim.fs.basename(addon_dir),
-        library_settings = { ["Lua.workspace.library"] = { addon_dir } },
+        name = vim.fs.basename(addon_path),
+        library_settings = { ["Lua.workspace.library"] = { vim.fs.joinpath(addon_path, "library") } },
+        -- library_settings = { ["Lua.workspace.library"] = { addon_path } },
         installed = true,
         config_settings = config.settings,
     }
