@@ -1,7 +1,7 @@
 local fs = require("lua_ls.fs")
 local utils = require("lua_ls.utils")
 local popup = require("lua_ls.popup")
-local client = require("lua_ls.client")
+local client = require("lua_ls.lsp")
 local AddonManager = require("lua_ls.addon_manager")
 local a = require("lua_ls.async")
 
@@ -11,7 +11,7 @@ local a = require("lua_ls.async")
 local data_path = vim.fn.stdpath("data")
 ---@cast data_path string
 
----@class (exact) lua_ls.Config
+---@class (exact) lua_ls.Config: lspconfig.Config
 ---@field settings? lua_ls.Settings
 
 ---@type lua_ls.Config
@@ -40,24 +40,34 @@ local default_config = {
 
 ---@class lua_ls
 ---@field config lua_ls.Config
-local M = {}
+---@field is_loaded boolean
+local M = {
+    is_loaded = false,
+}
 
 ---setup
----@param config lua_ls.Config
+---@param config? lua_ls.Config
 function M.setup(config)
-    M.config = vim.tbl_deep_extend("force", default_config, config or {})
+    config = vim.tbl_deep_extend("force", default_config, config or {})
+
+    local manager_settings = config.settings.Lua.addonManager
+    ---@cast manager_settings -nil
+    config.settings.Lua.addonManager = {
+        enable = manager_settings.enable,
+    }
     a.run(function()
-        if M.config.settings.Lua.addonManager.enable then
-            M.addon_manager = AddonManager.new(M.config.settings.Lua.addonManager)
+        if config.settings.Lua.addonManager.enable then
+            M.addon_manager = AddonManager.new(manager_settings)
             if pcall(require, "neoconf") then
                 require("lua_ls.neoconf").setup()
             end
             M.addon_manager:setup()
         end
-        vim.schedule(function()
-            client.setup(M.config)
-        end)
+    end, function()
+        M.is_loaded = true
     end)
+
+    client.setup(config)
 end
 
 function M.open()

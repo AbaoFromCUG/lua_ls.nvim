@@ -8,13 +8,15 @@
       ]
     }
   },
+  "neopyter": {},
   "lspconfig": {
     "lua_ls": {
       "Lua.addonManager.addons": [
         "nvim",
         "luassert",
         "busted",
-        "git@github.com:AbaoFromCUG/wezterm-luals-addon.git"
+        // "~/Documents/work/wezterm-luals-addon",
+        // "git@github.com:AbaoFromCUG/wezterm-luals-addon.git"
       ]
     }
   }

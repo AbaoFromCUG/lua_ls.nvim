@@ -68,7 +68,7 @@ function AddonManager:setup()
         end)
     end
     self:reload_addons()
-    local client = require("lua_ls.client")
+    local client = require("lua_ls.lsp")
     client.update_settings()
 end
 
@@ -80,7 +80,7 @@ function AddonManager:set_setting(new_setting)
     if not vim.deep_equal(setting, self.setting) then
         self.setting = setting
         self:reload_addons()
-        local client = require("lua_ls.client")
+        local client = require("lua_ls.lsp")
         client.update_settings()
     end
 end
@@ -162,8 +162,11 @@ function AddonManager:load_official_addon(info_path)
         size = info.size,
         description = info.description,
         has_plugin = info.hasPlugin,
-        -- library_settings = { ["Lua.workspace.library"] = { vim.fs.joinpath(addon_path, "library") } },
-        library_settings = { ["Lua.workspace.library"] = { addon_path } },
+        library_settings = {
+            ["Lua.workspace.library"] = {
+                vim.fs.joinpath(addon_path, "library"),
+            },
+        },
     }
     if fs.is_exists(config_path) then
         addon.installed = true
@@ -184,8 +187,9 @@ function AddonManager:load_local_addon(config_path)
     local addon = {
         id = vim.fs.basename(addon_path),
         name = vim.fs.basename(addon_path),
-        library_settings = { ["Lua.workspace.library"] = { vim.fs.joinpath(addon_path, "library") } },
-        -- library_settings = { ["Lua.workspace.library"] = { addon_path } },
+        library_settings = { ["Lua.workspace.library"] = {
+            vim.fs.joinpath(addon_path, "library"),
+        } },
         installed = true,
         config_settings = config.settings,
     }
