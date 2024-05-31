@@ -1,5 +1,3 @@
-local fs = require("lua_ls.fs")
-local utils = require("lua_ls.utils")
 local popup = require("lua_ls.popup")
 local client = require("lua_ls.lsp")
 local AddonManager = require("lua_ls.addon_manager")

@@ -12,11 +12,11 @@
   "lspconfig": {
     "lua_ls": {
       "Lua.addonManager.addons": [
+        // "~/Documents/work/wezterm-luals-addon",
+        // "git@github.com:AbaoFromCUG/wezterm-luals-addon.git",
         "nvim",
         "luassert",
-        "busted",
-        // "~/Documents/work/wezterm-luals-addon",
-        // "git@github.com:AbaoFromCUG/wezterm-luals-addon.git"
+        "busted"
       ]
     }
   }

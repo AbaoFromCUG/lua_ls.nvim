@@ -1,12 +1,5 @@
 local utils = require("lua_ls.utils")
 
----@type LazySpec
-local config = {
-    "AbaoFromCUG/lua_ls.nvim",
-    ---@type lua_ls.Config
-    opts = {},
-}
-
 describe("merge", function()
     describe("nil", function()
         it("empty", function()
@@ -88,21 +81,5 @@ describe("flatten", function()
     end)
     it("nested", function()
         assert.are.same({ foo = { bar = { name = "myname" } } }, utils.flatten({ foo = { ["bar.name"] = "myname" } }))
-    end)
-    it("builtin", function()
-        local result = vim
-            .iter({ 1, 2, 3 })
-            :map(function(i)
-                if i == 1 then
-                    return "key1", 12
-                elseif i == 2 then
-                    return "key2", 12
-                    -- return { { "key2", 22 }, { "key3", 32 } }
-                end
-                return "key3", 12
-            end)
-            -- :flatten()
-            :totable()
-        vim.print(result)
     end)
 end)
