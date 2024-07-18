@@ -1,30 +1,24 @@
-local a = require("lua_ls.async")
+local uv = vim.uv
 local fs = {}
 
 function fs.is_exists(path)
-    local err, stat = a.uv.fs_stat(path)
-    assert(err or stat)
-    assert(not err or not stat)
-    return not not stat
+    return uv.fs_stat(path)
 end
 
 ---read file content
 ---@param path string
 ---@return string
 function fs.read_file(path)
-    local err, fd = a.uv.fs_open(path, "r", 438)
-    assert(fd, vim.inspect(err) .. vim.inspect(path))
-    local err2, stat = a.uv.fs_stat(path)
-    assert(stat, vim.inspect(err2) .. vim.inspect(path))
-    local err3, content = a.uv.fs_read(fd, stat.size, 0)
-    assert(content, vim.inspect(err3) .. vim.inspect(path))
+    local fd = assert(uv.fs_open(path, "r", 438))
+    local stat = assert(uv.fs_stat(path))
+    local content = assert(uv.fs_read(fd, stat.size, 0))
     return content
 end
 
 function fs.write_file() end
 
 function fs.mkdir(path)
-    a.uv.fs_mkdir(path, 448)
+    uv.fs_mkdir(path, 448)
 end
 
 --- https://github.com/carsakiller/LLS-Addons/blob/main/schemas/addon_info.schema.json

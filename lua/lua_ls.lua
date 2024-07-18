@@ -1,7 +1,6 @@
 local popup = require("lua_ls.popup")
-local client = require("lua_ls.lsp")
+local lsp = require("lua_ls.lsp")
 local AddonManager = require("lua_ls.addon_manager")
-local a = require("lua_ls.async")
 
 ---@class (exact) lua_ls.Settings
 ---@field Lua? {addonManager?: lua_ls.AddonManagerSetting}
@@ -38,34 +37,26 @@ local default_config = {
 
 ---@class lua_ls
 ---@field config lua_ls.Config
----@field is_loaded boolean
-local M = {
-    is_loaded = false,
-}
+local M = {}
 
 ---setup
 ---@param config? lua_ls.Config
 function M.setup(config)
     config = vim.tbl_deep_extend("force", default_config, config or {})
-
     local manager_settings = config.settings.Lua.addonManager
     ---@cast manager_settings -nil
     config.settings.Lua.addonManager = {
         enable = manager_settings.enable,
     }
-    a.run(function()
-        if config.settings.Lua.addonManager.enable then
-            M.addon_manager = AddonManager.new(manager_settings)
-            if pcall(require, "neoconf") then
-                require("lua_ls.neoconf").setup()
-            end
-            M.addon_manager:setup()
-        end
-    end, function()
-        M.is_loaded = true
-    end)
+    M.addon_manager = AddonManager.new(manager_settings)
 
-    client.setup(config)
+    if pcall(require, "neoconf") then
+        require("lua_ls.neoconf").setup()
+    end
+    if config.settings.Lua.addonManager.enable then
+        M.addon_manager:setup()
+    end
+    lsp.setup(config)
 end
 
 function M.open()

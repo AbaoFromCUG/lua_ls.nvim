@@ -8,10 +8,12 @@
 ---@field config_settings? {[string]: any}
 ---@field library_settings {[string]: any}
 ---@field installed? boolean Whether this addon is installed
+---@field dependencies? string[]
 
 ---@alias lua_ls.NeovimAddonName
 ---| 'nvim'
----| 'nvim-nightly'
+---| 'nvim-config'
+---| 'nvim-all'
 
 --generated from $git submodule status |awk '{print $2}'|awk -F "/" '{print $2}'|sort
 ---@alias lua_ls.OfficialAddonName
