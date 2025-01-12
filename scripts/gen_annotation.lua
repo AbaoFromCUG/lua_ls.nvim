@@ -1,4 +1,4 @@
-local utils = require("lua_ls.utils")
+local utils = require("luals-addonmanager.utils")
 
 ---@class schema.Property
 ---@field default any

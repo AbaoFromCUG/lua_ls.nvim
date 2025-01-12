@@ -1,50 +1,58 @@
-# Lua Language Server
+# Introduction
 
-## Introduction
-
-`lua_ls.nvim` a wrapper of [lua language server](https://github.com/luals/lua-language-server)
+`luals-addonmanager.nvim` is a neovim plugin provide [Addon management capability](https://luals.github.io/wiki/addons/#addon-manager) for [lua language server](https://github.com/luals/lua-language-server)
 
 ![show case](./doc/luassert_and_busted.png)
 
-## Features 🌟
 
-- Addon Manager
-  - addon
-    - [x] install [LLS-Addons](https://github.com/LuaLS/LLS-Addons) automatically
-    - [x] local addon
-    - [x] remote addon
-  - neovim specific
-    - [x] neovim runtime path
-    - [x] neovim plugin(current `lazy.nvim` managed only)
+# Installation
 
-## Installation
-
-**NOTICE:**
-
-- Dependent on `nvim-lspconfig.nvim`
-- It is a substitute for `require("lspconfig").lua_ls.setup({})`
+- With 💤lazy.nvim:
 
 ```lua
-require("lua_ls").setup({
-    settings = {
-        Lua = {
-            ---@type lua_ls.AddonManagerSetting
-            addonManager = {
-                enable = true,
-                addons = {
-                    "nvim",
-                    "luassert",
-                    "busted",
-                    "nvim-lspconfig",
-                },
-            },
-        },
-    },
-})
+{
+    "AbaoFromCUG/luals-addonmanager.nvim",
+    event = "VeryLazy",
+    opts= {
+        enable = true,
+        addons = {
+            "nvim",
+            "luassert",
+            "nvim-lspconfig",
+        }
+
+    }
+}
 ```
 
-## Third-part integrations
+Supported addons
 
-### [Neoconf](https://github.com/folke/neoconf.nvim)
+- [x] Neovim plugins
+- [x] Install from [LLS-Addons](https://github.com/LuaLS/LLS-Addons) automatically
+- [x] Local addon
+- [x] Remote addon
 
-Reference to [neoconf.json](./.neoconf.json)
+# Integration
+
+
+## [Neoconf](https://github.com/folke/neoconf.nvim)
+
+`luals-addonmanager.nvim` support neoconf, like it's a native settings supported by lua language server
+
+`.neoconf.json`
+
+```
+{
+  "lspconfig": {
+    "lua_ls": {
+      "Lua.addonManager.addons": [
+        "nvim-full",
+        "nvim",
+        "nvim-lspconfig",
+        "luassert",
+        "busted"
+      ]
+    }
+  }
+}
+```

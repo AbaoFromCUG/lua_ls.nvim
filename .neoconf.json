@@ -12,11 +12,7 @@
   "lspconfig": {
     "lua_ls": {
       "Lua.addonManager.addons": [
-        "nvim-full",
         "nvim",
-        "nvim-lspconfig",
-        "luassert",
-        "busted"
       ]
     }
   }
