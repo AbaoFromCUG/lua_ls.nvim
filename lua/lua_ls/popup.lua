@@ -5,7 +5,7 @@ local size = function(max, value)
 end
 
 local function create_buf()
-    local config = require("luals-addonmanager").config
+    local config = require("lua_ls").config
     local bufnr = vim.api.nvim_create_buf(false, true)
 
     -- vim.bo[bufnr].modifiable = false
@@ -20,7 +20,7 @@ local function create_buf()
 end
 
 local function create_win(bufnr)
-    local config = require("luals-addonmanager").config
+    local config = require("lua_ls").config
     local win_config = {
         relative = "editor",
         title = "Lua language server's addons manager",

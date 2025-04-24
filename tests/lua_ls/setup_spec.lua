@@ -3,7 +3,7 @@ local lua_ls
 
 describe("default config", function()
     before_each(function()
-        lua_ls = require("luals-addonmanager")
+        lua_ls = require("lua_ls")
     end)
     after_each(function()
         for name, _ in pairs(package.loaded) do

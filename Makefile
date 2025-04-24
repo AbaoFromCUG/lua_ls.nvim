@@ -16,5 +16,3 @@ gen_types:
 		--headless \
 		-c "set rtp+=." -l ./scripts/gen_annotation.lua
 
-format:
-	stylua --check .

@@ -1,20 +1,10 @@
-local fs = require("luals-addonmanager.fs")
-local Git = require("luals-addonmanager.git")
-local utils = require("luals-addonmanager.utils")
+local fs = require("lua_ls.fs")
+local Git = require("lua_ls.git")
+local utils = require("lua_ls.utils")
 
 ---@class (exact) lua_ls.UIConfig
 ---@field size? {width?: number, height?:number}
 
----@class lua_ls.AddonManager
----@field official_repo_path string
----@field git lua_ls.Git
----@field addons { [string]: lua_ls.Addon } key is name or local path or url
----@field setting lua_ls.AddonManagerSetting
-local AddonManager = {
-    official_repo_url = "https://github.com/LuaLS/LLS-Addons/",
-    git = Git.new(),
-    addons = {},
-}
 
 ---@type {[string]: lua_ls.Addon}
 local builtin_addons = {
@@ -32,27 +22,27 @@ local builtin_addons = {
         display_name = "Neovim config",
         description = "neovim config files",
         library_settings = {
-            ---@diagnostic disable-next-line: param-type-mismatch
             ["Lua.workspace.library"] = { vim.fs.joinpath(vim.fn.stdpath("config"), "lua") },
         },
-        dependencies = { "luvit" },
+        dependencies = { "luvit", "nvim" },
     },
 }
 
----Addon manager construction
----@param manager_settings lua_ls.AddonManagerSetting
----@return lua_ls.AddonManager
-function AddonManager.new()
-    ---@type lua_ls.AddonManager
-    local o = {}
 
-    return o
-end
+---@class lua_ls.AddonManager
+---@field official_repo_path string
+---@field git lua_ls.Git
+---@field addons { [string]: lua_ls.Addon } key is name or local path or url
+local AddonManager = {
+    official_repo_url = "https://github.com/LuaLS/LLS-Addons/",
+    git = Git.new(),
+    addons = {},
+}
 
 ---@param name string
 ---@return string
 function AddonManager.repository_path(name)
-    local config = require("luals-addonmanager").config
+    local config = require("lua_ls").config
     local repository_path = vim.fs.joinpath(config.install_dir, name)
     return repository_path
 end
@@ -63,7 +53,7 @@ function AddonManager.setup()
 
     AddonManager.git:cwd(official_repo_path)
     if not fs.is_exists(official_repo_path) then
-        vim.notify("Downloading LLS-Addons...", { tiltle = "Addon Manager of lua_ls" })
+        vim.notify("Downloading LLS-Addons...", vim.log.levels.INFO, { tiltle = "Addon Manager of `lua_ls.nvim`" })
         fs.mkdir(official_repo_path)
         AddonManager.git:clone(AddonManager.official_repo_url, official_repo_path)
     end
@@ -78,14 +68,11 @@ function AddonManager.load_addon(name_or_url_or_path)
     local joinpath = vim.fs.joinpath
     local addon
     if fs.is_exists(joinpath(official_repo_path, "addons", name_or_url_or_path)) then
-        if AddonManager.addons[name_or_url_or_path] then
-            return AddonManager.addons[name_or_url_or_path]
-        end
         local prefix_path = joinpath(official_repo_path, "addons", name_or_url_or_path)
         local info_path = joinpath(prefix_path, "info.json")
         local addon_path = vim.fs.joinpath(prefix_path, "module")
         if not fs.is_exists(vim.fs.joinpath(addon_path, "config.json")) then
-            vim.notify(string.format("Clone submodule %s...", name_or_url_or_path), { tiltle = "Addon Manager of lua_ls" })
+            vim.notify(string.format("Clone submodule %s...", name_or_url_or_path), vim.log.levels.INFO, { tiltle = "Addon Manager of `lua_ls.nvim`" })
             AddonManager.git:submodule_init(addon_path)
             AddonManager.git:submodule_update(addon_path)
         end
@@ -97,9 +84,6 @@ function AddonManager.load_addon(name_or_url_or_path)
             dir = dir:sub(1, -5)
         end
         dir = dir:gsub("^.*/(.*)/?", "%1")
-        if AddonManager.addons[dir] then
-            return AddonManager.addons[dir]
-        end
         local addon_dir = AddonManager.repository_path(dir)
         local config_path = joinpath(addon_dir, "config.json")
         if not fs.is_exists(config_path) then
@@ -109,10 +93,6 @@ function AddonManager.load_addon(name_or_url_or_path)
         addon = AddonManager.load_local_addon(config_path)
     elseif fs.is_exists(joinpath(vim.fs.normalize(name_or_url_or_path), "config.json")) then
         local addon_dir = vim.fs.normalize(name_or_url_or_path)
-        local basename = vim.fs.basename(addon_dir)
-        if AddonManager.addons[basename] then
-            return AddonManager.addons
-        end
         local config_path = joinpath(addon_dir, "config.json")
         addon = AddonManager.load_local_addon(config_path)
     elseif builtin_addons[name_or_url_or_path] then
@@ -153,13 +133,12 @@ function AddonManager.try_resolve_nvim_plugin(name)
 
         local plugin = vim.iter(require("lazy").plugins())
             :filter(function(plugin)
-                return plugin.name == name or plugin[1] == name
+                return plugin.name == name
             end)
             :totable()[1]
         if plugin then
             return {
-                id = plugin[1],
-                name = name,
+                id = plugin.name,
                 display_name = string.format("%s(nvim plugin)", plugin.name),
                 description = plugin[1],
                 library_settings = {
@@ -171,10 +150,26 @@ function AddonManager.try_resolve_nvim_plugin(name)
 end
 
 function AddonManager.reload_addons()
-    local config = require("luals-addonmanager").config
+    local config = require("lua_ls").config
+    local offical_addons = vim.fs.find("info.json", { limit = math.huge, path = AddonManager.official_repo_path, type = "file" })
+    vim.iter(offical_addons):map(AddonManager.load_official_addon):each(function(addon)
+        AddonManager.addons[addon.id] = addon
+    end)
+
+    if package.loaded["lazy"] then
+        vim.iter(require("lazy").plugins())
+            :map(function(plugin)
+                return plugin.name
+            end)
+            :each(function(name)
+                AddonManager.load_addon(name)
+            end)
+    end
+
     for _, name in ipairs(config.addons) do
-        if not AddonManager.addons[name] then
-            AddonManager.load_addon(name)
+        AddonManager.load_addon(name)
+        if AddonManager.addons[name] then
+            AddonManager.addons[name].enabled = true
         end
     end
 end

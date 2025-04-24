@@ -1,17 +1,27 @@
-local utils = require("luals-addonmanager.utils")
+local utils = require("lua_ls.utils")
 
 local M = {}
 
----@param config lspconfig.Config
-function M.setup(config)
-    local settings = M.get_settings()
-    config.settings = utils.merge(config.settings or {}, settings)
-    -- require("lspconfig").lua_ls.setup(config)
-end
 
 function M.get_settings()
-    local addon_manager = require("luals-addonmanager").addon_manager
-    local all_settings = vim.iter(vim.tbl_values(addon_manager.addons))
+    local addon_manager = require("lua_ls.addon_manager")
+    local addons = vim.tbl_filter(function(addon)
+        return addon.enabled
+    end, vim.tbl_values(addon_manager.addons))
+    local i = 1
+    while i <= #addons do
+        ---@type lua_ls.Addon
+        local addon = addons[i]
+        if addon.dependencies then
+            vim.iter(addon.dependencies):each(function(name)
+                if addon_manager.addons[name] then
+                    table.insert(addons, addon_manager.addons[name])
+                end
+            end)
+        end
+        i = i + 1
+    end
+    local all_settings = vim.iter(addons)
         :map(function(addon)
             ---@cast addon lua_ls.Addon
             return { addon.library_settings, addon.config_settings }

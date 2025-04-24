@@ -8,6 +8,7 @@
 ---@field config_settings? {[string]: any}
 ---@field library_settings {[string]: any}
 ---@field installed? boolean Whether this addon is installed
+---@field enabled? boolean Whether this addon is enabled
 ---@field dependencies? string[]
 
 ---@alias lua_ls.NeovimAddonName

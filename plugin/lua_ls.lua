@@ -1,4 +1,4 @@
-local lua_ls = require("luals-addonmanager")
+local lua_ls = require("lua_ls")
 
 local cmds = {
     install = {

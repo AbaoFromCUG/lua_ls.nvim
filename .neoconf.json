@@ -1,19 +1,10 @@
 {
-  "neodev": {
-    "library": {
-      "enabled": true,
-      "plugins": [
-        "nvim-lspconfig",
-        "neoconf.nvim"
-      ]
-    }
-  },
   "neopyter": {},
-  "lspconfig": {
-    "lua_ls": {
-      "Lua.addonManager.addons": [
-        "nvim",
-      ]
-    }
+  "lua_ls": {
+    "addons": [
+      "nvim",
+      "neoconf.nvim",
+      "busted",
+    ]
   }
 }
