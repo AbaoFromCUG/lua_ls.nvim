@@ -144,6 +144,7 @@ function AddonManager.try_resolve_nvim_plugin(name)
                 library_settings = {
                     ["Lua.workspace.library"] = { vim.fs.joinpath(plugin.dir, "lua") },
                 },
+                dependencies = { "nvim" },
             }
         end
     end

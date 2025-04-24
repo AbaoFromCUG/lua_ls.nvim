@@ -2,7 +2,6 @@
   "neopyter": {},
   "lua_ls": {
     "addons": [
-      "nvim",
       "neoconf.nvim",
       "busted",
     ]
