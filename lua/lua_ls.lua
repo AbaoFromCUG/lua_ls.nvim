@@ -31,16 +31,15 @@ function M.setup(config)
     local lsp = require("lua_ls.lsp")
     local AddonManager = require("lua_ls.addon_manager")
     M.config = vim.tbl_deep_extend("force", default_config, config or {})
-    if not M.config.enable then
-        return
-    end
 
     if pcall(require, "neoconf") then
         require("lua_ls.neoconf").setup()
     end
 
     AddonManager.setup()
-    vim.lsp.enable("lua_ls")
+    if M.config.enable then
+        vim.lsp.enable("lua_ls")
+    end
 end
 
 return M
